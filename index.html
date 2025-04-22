@@ -1,16 +1,35 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>내 주식 트래커</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나의 주식 트래커</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>📈 내 주식 트래커</h1>
-  <div id="stock-container">
-    <p>삼성전자: <span id="price">불러오는 중...</span></p>
-  </div>
+  <header>
+    <h1>📈 나의 주식 트래커</h1>
+    <button id="theme-toggle">🌙 다크모드</button>
+  </header>
 
-  <script src="app.js"></script>
+  <main>
+    <div class="stock-card" id="tiger-snp500">
+      <h2>TIGER S&P500</h2>
+      <p class="price">불러오는 중...</p>
+    </div>
+
+    <div class="stock-card" id="tiger-nasdaq">
+      <h2>TIGER 나스닥100</h2>
+      <p class="price">불러오는 중...</p>
+    </div>
+    
+    <div class="stock-card" id="gld">
+        <h2>SPDR Gold Shares (GLD)</h2>
+        <p class="price">불러오는 중...</p>
+      </div>
+
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
