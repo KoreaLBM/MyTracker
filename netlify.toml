@@ -1,2 +1,10 @@
+[functions]
+directory = "netlify/functions"
+
+[dev]
+port = 8888
+functions = "netlify/functions"
+
 [build]
-  functions = "netlify/functions"
+functions = "netlify/functions"
+publish = "."
