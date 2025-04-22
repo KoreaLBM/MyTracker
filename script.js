@@ -33,7 +33,7 @@ async function fetchPrice(ticker, element) {
       `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=${ticker}&region=US`,
       {
         headers: {
-          'X-RapidAPI-Key': '여기에_발급받은_키',
+          'X-RapidAPI-Key': '6c865307d1mshb2bed331dc6fcb9p144e85jsn11938ccbd041',
           'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
         }
       }
@@ -48,3 +48,42 @@ async function fetchPrice(ticker, element) {
 }
 
 fetchPrice('GLD', gldElem);
+
+
+//아래는 GLD - Yahoo Finance API (RapidAPI)
+const fetchGLDPrice = async () => {
+  try {
+    const res = await fetch('https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-summary?symbol=GLD&region=US', {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': '6c865307d1mshb2bed331dc6fcb9p144e85jsn11938ccbd041',
+        'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+      }
+    });
+    const data = await res.json();
+    const price = data.price.regularMarketPrice.raw;
+    document.querySelector('#gld .price').textContent = price.toLocaleString() + ' USD';
+  } catch (error) {
+    console.error('GLD 가져오기 실패:', error);
+    document.querySelector('#gld .price').textContent = '불러오기 실패';
+  }
+};
+
+// 한국 ETF - 네이버 크롤링 (백엔드 또는 프록시 필요)
+// 예시: https://proxy-server.com/etf-price?code=123456
+
+const fetchKoreaETF = async (code, selector) => {
+  try {
+    const res = await fetch(`https://proxy-server.com/naver-etf-price?code=${code}`);
+    const data = await res.json();
+    document.querySelector(selector).textContent = data.price + ' 원';
+  } catch (err) {
+    console.error(`ETF ${code} 불러오기 실패`, err);
+    document.querySelector(selector).textContent = '불러오기 실패';
+  }
+};
+
+// 호출
+fetchGLDPrice();
+fetchKoreaETF('310970', '#tiger-snp500 .price');    // TIGER S&P500
+fetchKoreaETF('133690', '#tiger-nasdaq .price');     // TIGER 나스닥100
