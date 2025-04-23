@@ -6,14 +6,13 @@ exports.handler = async function () {
   try {
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: true,
+      defaultViewport: chromium.defaultViewport,
     });
 
     const page = await browser.newPage();
     await page.goto('https://finance.naver.com/item/main.nhn?code=489250', {
-      waitUntil: 'domcontentloaded',
       timeout: 15000
     });
 
@@ -26,14 +25,12 @@ exports.handler = async function () {
       body: JSON.stringify({ dividend: price }),
     };
   } catch (err) {
-    console.error('에러 발생:', err.message);
+    console.error('Dividend 크롤링 에러:', err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: '배당 ETF 에러: ' + err.message }),
     };
   } finally {
-    if (browser !== null) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 };

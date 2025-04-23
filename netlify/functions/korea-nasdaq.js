@@ -6,14 +6,13 @@ exports.handler = async function () {
   try {
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: true,
+      defaultViewport: chromium.defaultViewport,
     });
 
     const page = await browser.newPage();
-    await page.goto('https://finance.naver.com/item/main.nhn?code=133690', { // 종목코드(네이버)
-      waitUntil: 'domcontentloaded',
+    await page.goto('https://finance.naver.com/item/main.nhn?code=133690', {
       timeout: 15000
     });
 
@@ -23,17 +22,15 @@ exports.handler = async function () {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ nasdaq: price }), // 나스닥값 반환
+      body: JSON.stringify({ nasdaq: price }),
     };
   } catch (err) {
-    console.error('에러 발생:', err.message);
+    console.error('NASDAQ 크롤링 에러:', err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: 'NASDAQ 에러: ' + err.message }),
     };
   } finally {
-    if (browser !== null) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 };
