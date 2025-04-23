@@ -1,9 +1,7 @@
-const chromium = require('@sparticuz/chromium');
-const puppeteer = require('puppeteer-core');
-
 exports.handler = async function () {
   let browser = null;
   try {
+    console.log("Launching browser...");
     browser = await puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
@@ -12,26 +10,26 @@ exports.handler = async function () {
     });
 
     const page = await browser.newPage();
-    await page.goto('https://finance.naver.com/item/main.nhn?code=360750', {
-      timeout: 15000
-    });
+    const url = 'https://finance.naver.com/item/main.nhn?code=360750';
+    console.log(`Navigating to ${url}`);
+    await page.goto(url, { timeout: 15000, waitUntil: 'domcontentloaded' });
 
-    // 현재가
     await page.waitForSelector('.no_today .blind', { timeout: 5000 });
     const currentPrice = await page.$eval('.no_today .blind', el => el.innerText.trim());
+    console.log("Current price:", currentPrice);
 
-    // 전일가 - 안정적인 위치 기반으로 선택
     const prevClose = await page.$eval(
       'table.no_info tr:nth-child(1) td:first-child span.blind',
       el => el.innerText.trim()
     );
+    console.log("Previous close:", prevClose);
 
     return {
       statusCode: 200,
       body: JSON.stringify({ snp500: currentPrice, prevClose }),
     };
   } catch (err) {
-    console.error('SNP500 크롤링 에러:', err.message);
+    console.error('SNP500 크롤링 에러:', err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'SNP500 에러: ' + err.message }),
