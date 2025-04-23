@@ -24,12 +24,12 @@ body {
     border-radius: 8px;
   }
   
-  .dark {
+  .dark-mode {
     background-color: #121212;
     color: #fff;
   }
   
-  .dark .stock {
+  .dark-mode .stock {
     background-color: #1e1e1e;
   }
 
