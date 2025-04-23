@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // 국내 ETF DOM 요소
   const tigerSnpEl = document.querySelector('#tiger-snp500 .price');
+  const tigerSnpChangeEl = document.querySelector('#tiger-snp500 .change');
   const tigerNasdaqEl = document.querySelector('#tiger-nasdaq .price');
+  const tigerNasdaqChangeEl = document.querySelector('#tiger-nasdaq .change');
   const kodexDividendEl = document.querySelector('#kodex-dividend .price');
   const kodexBondEl = document.querySelector('#kodex-bond .price');
 
@@ -22,17 +24,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res1 = await fetch('/.netlify/functions/korea-snp500');
       const data1 = await res1.json();
-      tigerSnpEl.textContent = data1.snp500;
-    } catch {
+      const price = parseFloat(data1.snp500.replace(/,/g, ''));
+      const prev = parseFloat(data1.prevClose.replace(/,/g, ''));
+      const diff = ((price - prev) / prev * 100).toFixed(2);
+    
+      console.log('SNP500 현재가:', price);
+      console.log('SNP500 전일가:', prev);
+      console.log('SNP500 변동률:', diff);
+    
+      tigerSnpEl.textContent = `${data1.snp500}원`;
+      tigerSnpChangeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+      tigerSnpChangeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
+    } catch (e) {
+      console.error('SNP500 에러:', e);
       tigerSnpEl.textContent = '에러';
+      tigerSnpChangeEl.textContent = '';
     }
 
     try {
       const res2 = await fetch('/.netlify/functions/korea-nasdaq');
       const data2 = await res2.json();
-      tigerNasdaqEl.textContent = data2.nasdaq;
+      const price = parseFloat(data2.nasdaq.replace(/,/g, ''));
+      const prev = parseFloat(data2.prevClose.replace(/,/g, ''));
+      const diff = ((price - prev) / prev * 100).toFixed(2);
+      tigerNasdaqEl.textContent = `${data2.nasdaq}원`;
+      tigerNasdaqChangeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+      tigerNasdaqChangeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
     } catch {
       tigerNasdaqEl.textContent = '에러';
+      tigerNasdaqChangeEl.textContent = '';
     }
 
     try {
@@ -82,7 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 초기 fetch
   await fetchPrices();
   // setInterval(fetchPrices, 30000); // 필요 시 주석 해제
 
