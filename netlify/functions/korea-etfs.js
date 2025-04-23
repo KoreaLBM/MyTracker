@@ -1,7 +1,7 @@
 const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
 
-exports.handler = async function (event, context) {
+exports.handler = async function () {
   let browser = null;
   try {
     browser = await puppeteer.launch({
@@ -11,32 +11,27 @@ exports.handler = async function (event, context) {
       headless: chromium.headless,
     });
 
-    const page = await browser.newPage();
+    // 각 ETF마다 새로운 탭(page)을 열고, 해당 페이지에서 가격을 가져오는 방식
+    const urls = {
+      snp500: 'https://finance.naver.com/item/main.nhn?code=143850',
+      nasdaq: 'https://finance.naver.com/item/main.nhn?code=379800',
+      dividend: 'https://finance.naver.com/item/main.nhn?code=354500',
+      bondmix: 'https://finance.naver.com/item/main.nhn?code=329200',
+    };
 
-    // TIGER 미국S&P500 (A143850)
-    await page.goto('https://finance.naver.com/item/main.nhn?code=143850');
-    const price1 = await page.$eval('.no_today .blind', el => el.innerText);
+    const results = {};
 
-    // TIGER 나스닥100 (A379800)
-    await page.goto('https://finance.naver.com/item/main.nhn?code=379800');
-    const price2 = await page.$eval('.no_today .blind', el => el.innerText);
-
-    // KODEX 미국배당다우존스 (A354500)
-    await page.goto('https://finance.naver.com/item/main.nhn?code=354500');
-    const price3 = await page.$eval('.no_today .blind', el => el.innerText);
-
-    // KODEX 삼성전자채권혼합 (A329200)
-    await page.goto('https://finance.naver.com/item/main.nhn?code=329200');
-    const price4 = await page.$eval('.no_today .blind', el => el.innerText);
+    for (const [key, url] of Object.entries(urls)) {
+      const page = await browser.newPage();
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      const price = await page.$eval('.no_today .blind', el => el.innerText);
+      results[key] = price;
+      await page.close();
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        snp500: price1,
-        nasdaq: price2,
-        dividend: price3,
-        bondmix: price4,
-      }),
+      body: JSON.stringify(results),
     };
   } catch (err) {
     console.error('에러 발생:', err);
