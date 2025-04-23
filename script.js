@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const xluEl = document.querySelector('#xlu .price');
   const xlvEl = document.querySelector('#xlv .price');
 
+  // 전일 대비 표시
+  const gldChangeEl = document.querySelector('#gld .change');
+  const smhChangeEl = document.querySelector('#smh .change');
+  const xluChangeEl = document.querySelector('#xlu .change');
+  const xlvChangeEl = document.querySelector('#xlv .change');
+
   async function fetchPrices() {
     // ✅ 국내 ETF
     try {
@@ -49,16 +55,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res = await fetch('/.netlify/functions/us-etfs');
       const data = await res.json();
-    
-      gldEl.textContent = data['GLD'] ?? '에러';
-      smhEl.textContent = data['SMH'] ?? '에러';
-      xluEl.textContent = data['XLU'] ?? '에러';
-      xlvEl.textContent = data['XLV'] ?? '에러';
+
+      function update(etf, el, changeEl) {
+        const price = parseFloat(data[etf]?.price);
+        const prev = parseFloat(data[etf]?.prevClose);
+
+        if (!price || !prev) {
+          el.textContent = '에러';
+          changeEl.textContent = '';
+          return;
+        }
+
+        const diff = ((price - prev) / prev * 100).toFixed(2);
+        el.textContent = `$${price.toFixed(2)}`;
+        changeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+        changeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
+      }
+
+      update('GLD', gldEl, gldChangeEl);
+      update('SMH', smhEl, smhChangeEl);
+      update('XLU', xluEl, xluChangeEl);
+      update('XLV', xlvEl, xlvChangeEl);
     } catch {
-      gldEl.textContent = '에러';
-      smhEl.textContent = '에러';
-      xluEl.textContent = '에러';
-      xlvEl.textContent = '에러';
+      [gldEl, smhEl, xluEl, xlvEl].forEach(el => el.textContent = '에러');
+      [gldChangeEl, smhChangeEl, xluChangeEl, xlvChangeEl].forEach(el => el.textContent = '');
     }
   }
 

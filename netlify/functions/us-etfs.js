@@ -20,10 +20,12 @@ exports.handler = async function () {
         throw new Error('No ETF data found.');
       }
   
-      // 결과를 이름별로 매핑
       const etfData = {};
       results.forEach(item => {
-        etfData[item.symbol] = `$${item.regularMarketPrice}`;
+        etfData[item.symbol] = {
+          price: item.regularMarketPrice,
+          prevClose: item.regularMarketPreviousClose,
+        };
       });
   
       return {
