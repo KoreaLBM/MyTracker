@@ -1,6 +1,6 @@
 exports.handler = async function (event, context) {
   const fetch = await import('node-fetch'); // 동적 import
-  require('dotenv').config();
+  //require('dotenv').config();
   const apiKey = process.env.FINANCE_API_KEY;
   const symbol = 'GLD';
   const url = `https://yfapi.net/v6/finance/quote?symbols=${symbol}`;
