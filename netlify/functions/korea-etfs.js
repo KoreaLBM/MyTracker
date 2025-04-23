@@ -11,7 +11,6 @@ exports.handler = async function () {
       headless: chromium.headless,
     });
 
-    // 각 ETF마다 새로운 탭(page)을 열고, 해당 페이지에서 가격을 가져오는 방식
     const urls = {
       snp500: 'https://finance.naver.com/item/main.nhn?code=143850',
       nasdaq: 'https://finance.naver.com/item/main.nhn?code=379800',
@@ -20,14 +19,21 @@ exports.handler = async function () {
     };
 
     const results = {};
+    const page = await browser.newPage();
 
     for (const [key, url] of Object.entries(urls)) {
-      const page = await browser.newPage();
       await page.goto(url, { waitUntil: 'domcontentloaded' });
-      const price = await page.$eval('.no_today .blind', el => el.innerText);
+
+      // 핵심: 페이지 로딩을 기다려 안정성 확보
+      await page.waitForSelector('.no_today .blind');
+      const price = await page.$eval('.no_today .blind', el => el.innerText.trim());
       results[key] = price;
-      await page.close();
+
+      // 잠깐 지연을 주면 더 안정적
+      await new Promise(res => setTimeout(res, 500));
     }
+
+    await page.close();
 
     return {
       statusCode: 200,
