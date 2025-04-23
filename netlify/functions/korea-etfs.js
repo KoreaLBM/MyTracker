@@ -1,9 +1,16 @@
-// .netlify/functions/korea-etfs.js
-const puppeteer = require('puppeteer');
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
 
 exports.handler = async function (event, context) {
+  let browser = null;
   try {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+
     const page = await browser.newPage();
 
     await page.goto('https://finance.naver.com/item/main.nhn?code=143850');
@@ -11,8 +18,6 @@ exports.handler = async function (event, context) {
 
     await page.goto('https://finance.naver.com/item/main.nhn?code=379800');
     const price2 = await page.$eval('.no_today .blind', el => el.innerText);
-
-    await browser.close();
 
     return {
       statusCode: 200,
@@ -27,5 +32,9 @@ exports.handler = async function (event, context) {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
     };
+  } finally {
+    if (browser !== null) {
+      await browser.close();
+    }
   }
 };
