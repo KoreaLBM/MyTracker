@@ -18,17 +18,28 @@ exports.handler = async function () {
 
     await page.waitForSelector('.no_today .blind', { timeout: 5000 });
 
-    const price = await page.$eval('.no_today .blind', el => el.innerText.trim());
+    const currentPrice = await page.$eval('.no_today .blind', el => el.innerText.trim());
+
+    // 전일가 가져오기
+    const prevClose = await page.$$eval('.no_exday .blind', (elements) => {
+      for (let i = 0; i < elements.length; i++) {
+        const text = elements[i].innerText.trim();
+        if (text === '전일가') {
+          return elements[i + 1]?.innerText.trim(); // 전일가 바로 뒤의 값
+        }
+      }
+      return null;
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ nasdaq: price }),
+      body: JSON.stringify({ nasdaq: currentPrice, prevClose }),
     };
   } catch (err) {
-    console.error('NASDAQ 크롤링 에러:', err.message);
+    console.error('NASDAQ100 크롤링 에러:', err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'NASDAQ 에러: ' + err.message }),
+      body: JSON.stringify({ error: 'NASDAQ100 에러: ' + err.message }),
     };
   } finally {
     if (browser) await browser.close();

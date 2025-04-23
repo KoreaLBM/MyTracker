@@ -18,11 +18,22 @@ exports.handler = async function () {
 
     await page.waitForSelector('.no_today .blind', { timeout: 5000 });
 
-    const price = await page.$eval('.no_today .blind', el => el.innerText.trim());
+    const currentPrice = await page.$eval('.no_today .blind', el => el.innerText.trim());
+
+    // 전일가 가져오기
+    const prevClose = await page.$$eval('.no_exday .blind', (elements) => {
+      for (let i = 0; i < elements.length; i++) {
+        const text = elements[i].innerText.trim();
+        if (text === '전일가') {
+          return elements[i + 1]?.innerText.trim(); // 전일가 바로 뒤에 있는 요소
+        }
+      }
+      return null;
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ snp500: price }),
+      body: JSON.stringify({ snp500: currentPrice, prevClose }),
     };
   } catch (err) {
     console.error('SNP500 크롤링 에러:', err.message);
