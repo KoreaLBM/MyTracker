@@ -55,19 +55,18 @@ body {
     font-size: 0.9rem;
   }
   
-  .up {
-    color: #1db954; /* 초록색 */
+  .change {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
   }
   
-  .down {
-    color: #e02424; /* 빨간색 */
-  }
-
   .change.up {
-    color: red;
+    color: #1db954; /* 초록 (상승) */
   }
+  
   .change.down {
-    color: blue;
+    color: #e02424; /* 빨강 (하락) */
   }
   
   @media (max-width: 600px) {
