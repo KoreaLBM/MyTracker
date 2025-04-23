@@ -16,11 +16,11 @@ exports.handler = async function () {
       timeout: 15000
     });
 
+    // 현재가
     await page.waitForSelector('.no_today .blind', { timeout: 5000 });
-
     const currentPrice = await page.$eval('.no_today .blind', el => el.innerText.trim());
 
-    // 전일가 가져오기
+    // 전일가 - 안정적인 위치 기반으로 선택
     const prevClose = await page.$eval(
       'table.no_info tr:nth-child(1) td:first-child span.blind',
       el => el.innerText.trim()
