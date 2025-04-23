@@ -62,6 +62,13 @@ body {
   .down {
     color: #e02424; /* 빨간색 */
   }
+
+  .change.up {
+    color: red;
+  }
+  .change.down {
+    color: blue;
+  }
   
   @media (max-width: 600px) {
     .stock-container {
