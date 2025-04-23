@@ -41,16 +41,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const gldRes = await fetch('/.netlify/functions/gld');
       const gldData = await gldRes.json();
-      const gldPrice = gldData.quoteResponse.result[0].regularMarketPrice;
-      gldEl.textContent = `$${gldPrice}`;
+      gldEl.textContent = gldData.gld ?? '에러'; // `$가격` 형식이 잘 왔는지 확인
     } catch (e) {
       gldEl.textContent = '에러';
     }
   }
 
-  // 초기 fetch + 30초마다 갱신
+  // 초기 fetch 
   await fetchPrices();
-  setInterval(fetchPrices, 30000);
+  //setInterval(fetchPrices, 30000); // 30초마다 호출
 
   // 🌙 다크모드 토글
   const toggle = document.getElementById('theme-toggle');
