@@ -12,7 +12,7 @@ exports.handler = async function () {
     });
 
     const page = await browser.newPage();
-    await page.goto('https://finance.naver.com/item/main.nhn?code=379800', { // 종목코드(네이버)
+    await page.goto('https://finance.naver.com/item/main.nhn?code=133690', { // 종목코드(네이버)
       waitUntil: 'domcontentloaded',
       timeout: 15000
     });

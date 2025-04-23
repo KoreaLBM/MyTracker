@@ -12,7 +12,7 @@ exports.handler = async function () {
     });
 
     const page = await browser.newPage();
-    await page.goto('https://finance.naver.com/item/main.nhn?code=354500', {
+    await page.goto('https://finance.naver.com/item/main.nhn?code=489250', {
       waitUntil: 'domcontentloaded',
       timeout: 15000
     });
