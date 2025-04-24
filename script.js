@@ -55,7 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ✅ 국내 ETF
     try {
       const res1 = await fetch('/.netlify/functions/korea-snp500');
+      //const data1 = await res1.json();
       const data1 = await res1.json();
+      if (!data1.snp500 || !data1.prevClose) throw new Error("Invalid response format");
       const price = parseFloat(data1.snp500.replace(/,/g, ''));
       const prev = parseFloat(data1.prevClose.replace(/,/g, ''));
       const diff = ((price - prev) / prev * 100).toFixed(2);
@@ -76,6 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res2 = await fetch('/.netlify/functions/korea-nasdaq');
       const data2 = await res2.json();
+      if (!data2.nasdaq || !data2.prevClose) throw new Error("Invalid response format");
       const price = parseFloat(data2.nasdaq.replace(/,/g, ''));
       const prev = parseFloat(data2.prevClose.replace(/,/g, ''));
       const diff = ((price - prev) / prev * 100).toFixed(2);
@@ -96,6 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res3 = await fetch('/.netlify/functions/korea-dividend');
       const data3 = await res3.json();
+      if (!data3.dividend || !data3.prevClose) throw new Error("Invalid response format");
       const price = parseFloat(data3.dividend.replace(/,/g, ''));
       const prev = parseFloat(data3.prevClose.replace(/,/g, ''));
       const diff = ((price - prev) / prev * 100).toFixed(2);
@@ -116,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res4 = await fetch('/.netlify/functions/korea-bondmix');
       const data4 = await res4.json();
+      if (!data4.bondmix || !data4.prevClose) throw new Error("Invalid response format");
       const price = parseFloat(data4.bondmix.replace(/,/g, ''));
       const prev = parseFloat(data4.prevClose.replace(/,/g, ''));
       const diff = ((price - prev) / prev * 100).toFixed(2);
