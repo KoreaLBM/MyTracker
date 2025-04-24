@@ -1,3 +1,6 @@
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
+
 exports.handler = async function () {
   let browser = null;
   try {
