@@ -27,9 +27,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch("/.netlify/functions/bitcoin");
       const data = await res.json();
   
-      if (data.krwPrice && data.premium !== undefined) {
-        document.querySelector("#bitcoin .price").textContent = `${data.krwPrice}원`;
-        document.querySelector("#kimchi-premium .price").textContent = `${data.premium}%`;
+      if (data.price && data.changePercent !== undefined) {
+        const bitcoinEl = document.querySelector("#bitcoin");
+        const priceEl = bitcoinEl.querySelector(".price");
+        const changeEl = bitcoinEl.querySelector(".change");
+  
+        priceEl.textContent = `${data.price}원`;
+        changeEl.textContent = data.changePercent;
+  
+        // 색상 변경 (ETF들과 동일 스타일)
+        changeEl.classList.remove("up", "down");
+        if (data.changePercent.startsWith("+")) {
+          changeEl.classList.add("up");
+        } else {
+          changeEl.classList.add("down");
+        }
       }
     } catch (e) {
       console.error("Bitcoin 에러:", e);

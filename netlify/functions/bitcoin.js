@@ -21,8 +21,9 @@ exports.handler = async function () {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        krwPrice: krwPrice.toLocaleString(),
-        premium,
+        name: "비트코인",
+        price: krwPrice.toLocaleString(),
+        changePercent: `${premium > 0 ? "+" : ""}${premium}%`, // ex) "+1.23%" or "-0.98%"
       }),
     };
   } catch (err) {
