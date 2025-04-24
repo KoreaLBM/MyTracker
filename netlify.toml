@@ -1,6 +1,8 @@
 [functions]
 directory = "netlify/functions"
 node_bundler = "esbuild"
+external_node_modules = ["puppeteer-core", "@sparticuz/chromium"]
+included_files = ["node_modules/@sparticuz/chromium/**"]
 
 [dev]
 port = 8888

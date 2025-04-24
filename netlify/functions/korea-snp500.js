@@ -7,9 +7,9 @@ exports.handler = async function () {
     console.log("Launching browser...");
     browser = await puppeteer.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath(),
-      headless: true,
-      defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath() || '/tmp/chromium',
+        headless: chromium.headless,
+        defaultViewport: chromium.defaultViewport,
     });
 
     const page = await browser.newPage();
