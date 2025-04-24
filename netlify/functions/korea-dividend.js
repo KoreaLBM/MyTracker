@@ -25,7 +25,7 @@ exports.handler = async function () {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ nasdaq: currentPrice, prevClose }),
+      body: JSON.stringify({ dividend: currentPrice, prevClose }),
     };
   } catch (err) {
     console.error('KODEX미국배당다우존스 크롤링 에러:', err);

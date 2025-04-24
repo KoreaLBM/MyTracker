@@ -25,7 +25,7 @@ exports.handler = async function () {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ nasdaq: currentPrice, prevClose }),
+      body: JSON.stringify({ bondmix: currentPrice, prevClose }),
     };
   } catch (err) {
     console.error('KODEX삼성전자채권혼합 크롤링 에러:', err);
