@@ -24,25 +24,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function fetchBitcoin() {
     try {
-      const res = await fetch("/.netlify/functions/bitcoin");
-      const data = await res.json();
+      // 서버 함수에서 바이낸스+환율 정보 받기
+      const serverRes = await fetch("/.netlify/functions/bitcoin");
+      const serverData = await serverRes.json();
   
-      if (data.price && data.changePercent !== undefined) {
-        const bitcoinEl = document.querySelector("#bitcoin");
-        const priceEl = bitcoinEl.querySelector(".price");
-        const changeEl = bitcoinEl.querySelector(".change");
+      // 클라이언트에서 업비트 가격 받기
+      const upbitRes = await fetch("https://api.upbit.com/v1/ticker?markets=KRW-BTC");
+      const upbitData = await upbitRes.json();
+      const krwPrice = upbitData[0].trade_price;
   
-        priceEl.textContent = `${data.price}원`;
-        changeEl.textContent = data.changePercent;
+      const globalKrw = serverData.usdPrice * serverData.usdKrw;
+      const premium = (((krwPrice - globalKrw) / globalKrw) * 100).toFixed(2);
   
-        // 색상 변경 (ETF들과 동일 스타일)
-        changeEl.classList.remove("up", "down");
-        if (data.changePercent.startsWith("+")) {
-          changeEl.classList.add("up");
-        } else {
-          changeEl.classList.add("down");
-        }
-      }
+      // DOM 업데이트
+      document.querySelector("#bitcoin .price").textContent = `${krwPrice.toLocaleString()}원`;
+      document.querySelector("#kimchi-premium .price").textContent = `${premium}%`;
+  
+      // 색상으로 프리미엄 시각화
+      const premiumEl = document.querySelector("#kimchi-premium .price");
+      premiumEl.style.color = premium > 0 ? "red" : premium < 0 ? "blue" : "gray";
+  
     } catch (e) {
       console.error("Bitcoin 에러:", e);
     }
@@ -185,10 +186,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  await fetchPrices();
-  // setInterval(fetchPrices, 30000); // 필요 시 주석 해제
   await fetchUsdKrw();
   await fetchBitcoin();
+  await fetchPrices();
+  // setInterval(fetchPrices, 30000); // 필요 시 주석 해제
 
   // 🌙 다크모드 토글
   const toggle = document.getElementById('theme-toggle');
