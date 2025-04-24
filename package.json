@@ -3,7 +3,6 @@
     "@sparticuz/chromium": "^133.0.0",
     "axios": "^1.8.4",
     "node-fetch": "^2.7.0",
-    "puppeteer": "^24.7.1",
     "puppeteer-core": "^24.7.2"
   },
   "name": "mytracker",
