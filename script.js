@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       premiumEl.style.color = premium > 0 ? "red" : premium < 0 ? "blue" : "gray";
   
     } catch (e) {
-      console.error("Bitcoin 에러:", e);
+      console.error("Bitcoin 에러:", e); //
     }
   }
 
