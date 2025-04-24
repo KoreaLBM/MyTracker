@@ -38,16 +38,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function fetchUsdKrw() {
     try {
-      const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=KRW");
+      const res = await fetch('/.netlify/functions/usd-krw');
       const data = await res.json();
   
-      const rate = data.rates.KRW.toFixed(2);
-      console.log("환율 (USD → KRW):", rate); // ✅ 로그 확인
+      const rate = data.rate;
+      const change = data.change;
   
-      document.querySelector("#usd-krw .price").textContent = `${rate}원`;
-    } catch (e) {
-      console.error("USD/KRW 에러:", e);
-      document.querySelector("#usd-krw .price").textContent = "에러";
+      document.getElementById('usd-krw-price').textContent = rate;
+      document.getElementById('usd-krw-change').textContent = change || '-';
+    } catch (err) {
+      console.error('USD/KRW 에러:', err);
     }
   }
 
