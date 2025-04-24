@@ -36,16 +36,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // script.js 내 fetchUsdKrw 함수 수정
   async function fetchUsdKrw() {
     try {
       const res = await fetch('/.netlify/functions/usd-krw');
       const data = await res.json();
-  
+
       const rate = data.rate;
       const change = data.change;
-  
-      document.getElementById('usd-krw-price').textContent = rate;
-      document.getElementById('usd-krw-change').textContent = change || '-';
+
+      const usdKrwPriceEl = document.querySelector('#usd-krw .price');
+      const usdKrwChangeEl = document.querySelector('#usd-krw .change');
+
+      usdKrwPriceEl.textContent = rate;
+      usdKrwChangeEl.textContent = change || '-';
     } catch (err) {
       console.error('USD/KRW 에러:', err);
     }
