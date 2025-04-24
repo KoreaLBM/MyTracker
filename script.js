@@ -21,6 +21,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   const xluChangeEl = document.querySelector('#xlu .change');
   const xlvChangeEl = document.querySelector('#xlv .change');
 
+
+  async function fetchBitcoin() {
+    try {
+      const res = await fetch("/.netlify/functions/bitcoin");
+      const data = await res.json();
+  
+      if (data.krwPrice && data.premium !== undefined) {
+        document.querySelector("#bitcoin .price").textContent = `${data.krwPrice}원`;
+        document.querySelector("#kimchi-premium .price").textContent = `${data.premium}%`;
+      }
+    } catch (e) {
+      console.error("Bitcoin 에러:", e);
+    }
+  }
+
+  async function fetchUsdKrw() {
+    try {
+      const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=KRW");
+      const data = await res.json();
+  
+      const rate = data.rates.KRW.toFixed(2);
+      console.log("환율 (USD → KRW):", rate); // ✅ 로그 확인
+  
+      document.querySelector("#usd-krw .price").textContent = `${rate}원`;
+    } catch (e) {
+      console.error("USD/KRW 에러:", e);
+      document.querySelector("#usd-krw .price").textContent = "에러";
+    }
+  }
+
   async function fetchPrices() {
     // ✅ 국내 ETF
     try {
@@ -136,6 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await fetchPrices();
   // setInterval(fetchPrices, 30000); // 필요 시 주석 해제
+  await fetchUsdKrw();
+  await fetchBitcoin();
 
   // 🌙 다크모드 토글
   const toggle = document.getElementById('theme-toggle');
