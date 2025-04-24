@@ -12,31 +12,23 @@ exports.handler = async function () {
     });
 
     const page = await browser.newPage();
-    await page.goto('https://finance.naver.com/item/main.nhn?code=133690', {
-      timeout: 15000
-    });
+    const url = 'https://finance.naver.com/item/main.nhn?code=133690'; // TIGER 나스닥100
+    await page.goto(url, { timeout: 15000, waitUntil: 'domcontentloaded' });
 
     await page.waitForSelector('.no_today .blind', { timeout: 5000 });
-
     const currentPrice = await page.$eval('.no_today .blind', el => el.innerText.trim());
 
-    // 전일가 가져오기
-    const prevClose = await page.$$eval('.no_exday .blind', (elements) => {
-      for (let i = 0; i < elements.length; i++) {
-        const text = elements[i].innerText.trim();
-        if (text === '전일가') {
-          return elements[i + 1]?.innerText.trim(); // 전일가 바로 뒤의 값
-        }
-      }
-      return null;
-    });
+    const prevClose = await page.$eval(
+      'table.no_info tr:nth-child(1) td:first-child span.blind',
+      el => el.innerText.trim()
+    );
 
     return {
       statusCode: 200,
       body: JSON.stringify({ nasdaq: currentPrice, prevClose }),
     };
   } catch (err) {
-    console.error('NASDAQ100 크롤링 에러:', err.message);
+    console.error('NASDAQ100 크롤링 에러:', err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'NASDAQ100 에러: ' + err.message }),

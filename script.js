@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tigerNasdaqEl = document.querySelector('#tiger-nasdaq .price');
   const tigerNasdaqChangeEl = document.querySelector('#tiger-nasdaq .change');
   const kodexDividendEl = document.querySelector('#kodex-dividend .price');
+  const kodexDividendChangeEl = document.querySelector('#kodex-dividend .change');
   const kodexBondEl = document.querySelector('#kodex-bond .price');
+  const kodexBondChangeEl = document.querySelector('#kodex-bond .change');
 
   // 해외 ETF DOM 요소
   const gldEl = document.querySelector('#gld .price');
@@ -40,35 +42,65 @@ document.addEventListener('DOMContentLoaded', async () => {
       tigerSnpEl.textContent = '에러';
       tigerSnpChangeEl.textContent = '';
     }
-
+    
     try {
       const res2 = await fetch('/.netlify/functions/korea-nasdaq');
       const data2 = await res2.json();
       const price = parseFloat(data2.nasdaq.replace(/,/g, ''));
       const prev = parseFloat(data2.prevClose.replace(/,/g, ''));
       const diff = ((price - prev) / prev * 100).toFixed(2);
+    
+      console.log('NASDAQ 현재가:', price);
+      console.log('NASDAQ 전일가:', prev);
+      console.log('NASDAQ 변동률:', diff);
+    
       tigerNasdaqEl.textContent = `${data2.nasdaq}원`;
       tigerNasdaqChangeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
       tigerNasdaqChangeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
-    } catch {
-      tigerNasdaqEl.textContent = '에러';
-      tigerNasdaqChangeEl.textContent = '';
+    } catch (e) {
+      console.error('NASDAQ 에러:', e);
+      tigerSnpEl.textContent = '에러';
+      tigerSnpChangeEl.textContent = '';
     }
 
     try {
       const res3 = await fetch('/.netlify/functions/korea-dividend');
       const data3 = await res3.json();
-      kodexDividendEl.textContent = data3.dividend;
-    } catch {
+      const price = parseFloat(data3.dividend.replace(/,/g, ''));
+      const prev = parseFloat(data3.prevClose.replace(/,/g, ''));
+      const diff = ((price - prev) / prev * 100).toFixed(2);
+    
+      console.log('KODEX SCHD 현재가:', price);
+      console.log('KODEX SCHD 전일가:', prev);
+      console.log('KODEX SCHD 변동률:', diff);
+    
+      kodexDividendEl.textContent = `${data3.dividend}원`;
+      kodexDividendChangeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+      kodexDividendChangeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
+    } catch (e) {
+      console.error('KODEX SCHD 에러:', e);
       kodexDividendEl.textContent = '에러';
+      kodexDividendChangeEl.textContent = '';
     }
 
     try {
       const res4 = await fetch('/.netlify/functions/korea-bondmix');
       const data4 = await res4.json();
-      kodexBondEl.textContent = data4.bondmix;
-    } catch {
+      const price = parseFloat(data4.bondmix.replace(/,/g, ''));
+      const prev = parseFloat(data4.prevClose.replace(/,/g, ''));
+      const diff = ((price - prev) / prev * 100).toFixed(2);
+    
+      console.log('KODEX 삼성채권혼합 현재가:', price);
+      console.log('KODEX 삼성채권혼합 전일가:', prev);
+      console.log('KODEX 삼성채권혼합 변동률:', diff);
+    
+      kodexBondEl.textContent = `${data4.bondmix}원`;
+      kodexBondChangeEl.textContent = `${diff > 0 ? '+' : ''}${diff}%`;
+      kodexBondChangeEl.className = `change ${diff > 0 ? 'up' : 'down'}`;
+    } catch (e) {
+      console.error('KODEX 삼성채권혼합 에러:', e);
       kodexBondEl.textContent = '에러';
+      kodexBondChangeEl.textContent = '';
     }
 
     // ✅ 해외 ETF (한 번에 요청)
