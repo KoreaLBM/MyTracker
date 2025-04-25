@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const premium = (((krwPrice - globalKrw) / globalKrw) * 100).toFixed(2);
   
       // DOM 업데이트
-      document.querySelector("#bitcoin .price").textContent = `${krwPrice.toLocaleString()}원`;
-      document.querySelector("#kimchi-premium .price").textContent = `${premium}%`;
+      document.querySelector("#btc-krw-price").textContent = `${krwPrice.toLocaleString()}원`;
+      document.querySelector("#kimchi-premium").textContent = `${premium}%`;
   
       // 색상으로 프리미엄 시각화
       const premiumEl = document.querySelector("#kimchi-premium .price");
