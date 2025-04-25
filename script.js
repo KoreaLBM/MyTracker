@@ -24,28 +24,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function fetchBitcoin() {
     try {
-      // 서버 함수에서 바이낸스+환율 정보 받기
+      // 서버 함수에서 가격 + 환율 + 프리미엄 정보 받기
       const serverRes = await fetch("/.netlify/functions/bitcoin");
       const serverData = await serverRes.json();
   
-      // 클라이언트에서 업비트 가격 받기
-      const upbitRes = await fetch("https://api.upbit.com/v1/ticker?markets=KRW-BTC");
-      const upbitData = await upbitRes.json();
-      const krwPrice = upbitData[0].trade_price;
-  
-      const globalKrw = serverData.usdPrice * serverData.usdKrw;
-      const premium = (((krwPrice - globalKrw) / globalKrw) * 100).toFixed(2);
+      const krwPrice = serverData.krwPrice;
+      const premium = parseFloat(serverData.premium).toFixed(2);
   
       // DOM 업데이트
       document.querySelector("#btc-krw-price").textContent = `${krwPrice.toLocaleString()}원`;
-      document.querySelector("#kimchi-premium").textContent = `${premium}%`;
   
-      // 색상으로 프리미엄 시각화
-      const premiumEl = document.querySelector("#kimchi-premium .price");
-      premiumEl.style.color = premium > 0 ? "red" : premium < 0 ? "blue" : "gray";
+      const premiumEl = document.querySelector("#kimchi-premium");
+      premiumEl.textContent = `${premium > 0 ? '+' : ''}${premium}%`;
+      premiumEl.className = `change ${premium > 0 ? 'up' : premium < 0 ? 'down' : ''}`;
   
     } catch (e) {
-      console.error("Bitcoin 에러:", e); //
+      console.error("Bitcoin 에러:", e);
+      document.querySelector("#btc-krw-price").textContent = '에러';
+      document.querySelector("#kimchi-premium").textContent = '';
     }
   }
 
