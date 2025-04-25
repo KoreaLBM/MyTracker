@@ -7,12 +7,12 @@ exports.handler = async function () {
     const upbitRes = await axios.get("https://api.upbit.com/v1/ticker?markets=KRW-BTC");
     const krwPrice = parseFloat(upbitRes.data[0].trade_price);
 
-    // 2. 바이낸스 USD 시세
-    const binanceRes = await axios.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-    const usdPrice = parseFloat(binanceRes.data.price);
+    // 2. CoinGecko USD 시세
+    const geckoRes = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+    const usdPrice = parseFloat(geckoRes.data.bitcoin.usd);
 
     // 3. 환율: 다른 Netlify 함수에서 호출
-    const baseUrl = process.env.URL || "http://localhost:8888"; // Netlify 배포 시 자동 설정됨
+    const baseUrl = process.env.URL || "http://localhost:8888";
     const fxRes = await fetch(`${baseUrl}/.netlify/functions/usd-krw`);
     const fxData = await fxRes.json();
 
