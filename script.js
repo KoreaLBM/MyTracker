@@ -182,35 +182,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function fetchLandTransaction() {
+  async function fetchLandTransaction(areaMin = 59, areaMax = 60) {
     try {
-      const res = await fetch('/.netlify/functions/land-transaction');
+      const res = await fetch(`/.netlify/functions/land-transaction?areaMin=${areaMin}&areaMax=${areaMax}`);
       const data = await res.json();
       console.log("📦 부동산 응답:", data);
   
-      if (data.error) {
-        document.getElementById('apt-price').textContent = data.error;
-        document.getElementById('apt-date').textContent = '-';
-        document.getElementById('apt-floor').textContent = '-';
-        return;
+      // 매매
+      if (data.sale) {
+        document.getElementById('apt-sale-price').textContent = `${data.sale.price}`;
+        document.getElementById('apt-sale-date').textContent = data.sale.date;
+        document.getElementById('apt-sale-floor').textContent = data.sale.floor;
+      } else {
+        document.getElementById('apt-sale-price').textContent = '없음';
+        document.getElementById('apt-sale-date').textContent = '-';
+        document.getElementById('apt-sale-floor').textContent = '-';
       }
   
-      document.getElementById('apt-price').textContent = `${data.price}만원`;
-      document.getElementById('apt-date').textContent = data.date;
-      document.getElementById('apt-floor').textContent = `${data.floor}층`;
+      // 전세
+      if (data.rent) {
+        document.getElementById('apt-rent-price').textContent = `${data.rent.price}`;
+        document.getElementById('apt-rent-date').textContent = data.rent.date;
+        document.getElementById('apt-rent-floor').textContent = data.rent.floor;
+      } else {
+        document.getElementById('apt-rent-price').textContent = '없음';
+        document.getElementById('apt-rent-date').textContent = '-';
+        document.getElementById('apt-rent-floor').textContent = '-';
+      }
     } catch (err) {
-      console.error("❌ 부동산 데이터 오류:", err);
-      document.getElementById('apt-price').textContent = '에러';
-      document.getElementById('apt-date').textContent = '-';
-      document.getElementById('apt-floor').textContent = '-';
+      console.error("❌ 부동산 오류:", err);
     }
   }
   
-  // 호출
+  // 처음엔 59형으로 로딩
   fetchLandTransaction();
-
-
-
+  
+  // 예: 버튼 클릭 시 평형 바꾸기
+  document.getElementById('type59').addEventListener('click', () => fetchLandTransaction(59, 60));
+  document.getElementById('type84').addEventListener('click', () => fetchLandTransaction(84, 85));
 
   await fetchUsdKrw();
   await fetchBitcoin();

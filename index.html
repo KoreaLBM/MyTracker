@@ -81,14 +81,24 @@
       </div>
     </div>
 
-    <!-- 실거래가 섹션 -->
+    <!-- 부동산 섹션 -->
 <div class="stock-section">
-    <h2>🏠 실거래가 (인덕원센트럴푸르지오 82A)</h2>
+    <h2>🏠 실거래가 (인덕원센트럴푸르지오)</h2>
+    <!-- 선택 버튼 -->
+<div style="margin: 10px 0;">
+    <button id="type59">🏠 59㎡형 보기</button>
+    <button id="type84">🏠 84㎡형 보기</button>
+  </div>
     <div class="stock-container">
-      <div class="stock" id="apt-transaction">
-        실거래가: <span class="price" id="apt-price">불러오는 중...</span><br />
-        날짜: <span class="price" id="apt-date">불러오는 중...</span>,
-        층: <span class="price" id="apt-floor">불러오는 중...</span>
+      <div class="stock" id="apt-sale">
+        <strong>매매가:</strong> <span class="price" id="apt-sale-price">불러오는 중...</span><br />
+        날짜: <span class="price" id="apt-sale-date">-</span>,
+        층: <span class="price" id="apt-sale-floor">-</span>
+      </div>
+      <div class="stock" id="apt-rent">
+        <strong>전세가:</strong> <span class="price" id="apt-rent-price">불러오는 중...</span><br />
+        날짜: <span class="price" id="apt-rent-date">-</span>,
+        층: <span class="price" id="apt-rent-floor">-</span>
       </div>
     </div>
   </div>

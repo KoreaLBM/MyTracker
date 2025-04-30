@@ -1,72 +1,89 @@
-// netlify/functions/land-transaction.js
 const axios = require('axios');
 
-exports.handler = async function () {
+exports.handler = async function (event) {
   const API_KEY = process.env.API_KEY;
-  const LAWD_CD = '41430'; // 의왕시
+  const LAWD_CD = '41430';
   const now = new Date();
 
-  // 최근 3개월 생성
   const searchMonths = [...Array(3)].map((_, i) => {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  try {
-    for (const DEAL_YMD of searchMonths) {
-      const url = `https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev?` +
-                  `serviceKey=${encodeURIComponent(API_KEY)}` +
-                  `&LAWD_CD=${LAWD_CD}` +
-                  `&DEAL_YMD=${DEAL_YMD}` +
-                  `&_type=json&pageNo=1&numOfRows=100`;
+  const query = event.queryStringParameters || {};
+  const areaMin = parseFloat(query.areaMin) || 59;
+  const areaMax = parseFloat(query.areaMax) || 60;
 
-      const { data } = await axios.get(url);
-      const items = data?.response?.body?.items?.item;
+  let saleData = null;
+  let rentData = null;
 
-      if (!items) continue;
-
-      const allNames = Array.isArray(items) ? items.map(i => i.aptNm) : [items.aptNm];
-      console.log(`📋 [${DEAL_YMD}] 아파트 이름 목록: ${[...new Set(allNames)].join(', ')}`);
-
-      const filtered = (Array.isArray(items) ? items : [items])
-        .filter(item =>
-          item.aptNm.includes('인덕원센트럴푸르지오') &&
-          item.excluUseAr >= 59 && item.excluUseAr <= 60
-        )
-        .sort((a, b) => {
-          const dateA = new Date(`${a.dealYear}-${a.dealMonth}-${a.dealDay}`);
-          const dateB = new Date(`${b.dealYear}-${b.dealMonth}-${b.dealDay}`);
-          return dateB - dateA;
+  for (const DEAL_YMD of searchMonths) {
+    // 매매
+    if (!saleData) {
+      try {
+        const saleRes = await axios.get(`https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev`, {
+          params: {
+            serviceKey: API_KEY,
+            LAWD_CD,
+            DEAL_YMD,
+            _type: 'json',
+            pageNo: 1,
+            numOfRows: 100
+          }
         });
-
-      if (filtered.length > 0) {
-        const latest = filtered[0];
-        return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8'
-          },
-          body: JSON.stringify({
+        const items = saleRes?.data?.response?.body?.items?.item;
+        const filtered = (Array.isArray(items) ? items : [items])
+          .filter(i => i.aptNm.includes('인덕원센트럴푸르지오') && i.excluUseAr >= areaMin && i.excluUseAr < areaMax)
+          .sort((a, b) => new Date(`${b.dealYear}-${b.dealMonth}-${b.dealDay}`) - new Date(`${a.dealYear}-${a.dealMonth}-${a.dealDay}`));
+        if (filtered[0]) {
+          const latest = filtered[0];
+          saleData = {
             apartment: latest.aptNm,
+            type: '매매',
             area: latest.excluUseAr,
-            price: latest.dealAmount,
-            floor: latest.floor,
+            price: `${latest.dealAmount}만원`,
+            floor: `${latest.floor}층`,
             date: `${latest.dealYear}.${String(latest.dealMonth).padStart(2, '0')}.${String(latest.dealDay).padStart(2, '0')}`
-          })
-        };
-      }
+          };
+        }
+      } catch (e) {}
     }
 
-    return {
-      statusCode: 404,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({ error: '82A 실거래 내역 없음 (최근 3개월)' })
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({ error: 'API 호출 실패', details: err.message })
-    };
+    // 전세
+    if (!rentData) {
+      try {
+        const rentRes = await axios.get(`https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent`, {
+          params: {
+            serviceKey: API_KEY,
+            LAWD_CD,
+            DEAL_YMD,
+            _type: 'json',
+            pageNo: 1,
+            numOfRows: 100
+          }
+        });
+        const items = rentRes?.data?.response?.body?.items?.item;
+        const filtered = (Array.isArray(items) ? items : [items])
+          .filter(i => i.aptNm.includes('인덕원센트럴푸르지오') && i.excluUseAr >= areaMin && i.excluUseAr < areaMax)
+          .sort((a, b) => new Date(`${b.dealYear}-${b.dealMonth}-${b.dealDay}`) - new Date(`${a.dealYear}-${a.dealMonth}-${a.dealDay}`));
+        if (filtered[0]) {
+          const latest = filtered[0];
+          rentData = {
+            apartment: latest.aptNm,
+            type: '전세',
+            area: latest.excluUseAr,
+            price: `${latest.deposit}만원`,
+            floor: `${latest.floor}층`,
+            date: `${latest.dealYear}.${String(latest.dealMonth).padStart(2, '0')}.${String(latest.dealDay).padStart(2, '0')}`
+          };
+        }
+      } catch (e) {}
+    }
   }
+
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body: JSON.stringify({ sale: saleData, rent: rentData })
+  };
 };
