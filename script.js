@@ -182,9 +182,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  async function fetchLandTransaction() {
+    try {
+      const res = await fetch('/.netlify/functions/land-transaction');
+      const data = await res.json();
+      console.log("📦 부동산 응답:", data);
+  
+      if (data.error) {
+        document.getElementById('apt-price').textContent = data.error;
+        document.getElementById('apt-date').textContent = '-';
+        document.getElementById('apt-floor').textContent = '-';
+        return;
+      }
+  
+      document.getElementById('apt-price').textContent = `${data.price}만원`;
+      document.getElementById('apt-date').textContent = data.date;
+      document.getElementById('apt-floor').textContent = `${data.floor}층`;
+    } catch (err) {
+      console.error("❌ 부동산 데이터 오류:", err);
+      document.getElementById('apt-price').textContent = '에러';
+      document.getElementById('apt-date').textContent = '-';
+      document.getElementById('apt-floor').textContent = '-';
+    }
+  }
+  
+  // 호출
+  fetchLandTransaction();
+
+
+
+
   await fetchUsdKrw();
   await fetchBitcoin();
   await fetchPrices();
+  await fetchLandTransaction();
   // setInterval(fetchPrices, 30000); // 필요 시 주석 해제
 
   // 🌙 다크모드 토글
